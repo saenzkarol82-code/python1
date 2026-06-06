@@ -1,39 +1,78 @@
-from flask import Flask, render_template, request, session
-import random
+from flask import Flask, render_template, request
+from database import conectar_postgres, coleccion_estudiantes
 
 app = Flask(__name__)
-app.secret_key = "clave-super-secreta"  # Necesaria para manejar sesiones
 
 @app.route("/", methods=["GET", "POST"])
 def index():
-    # Si no existe número en sesión, lo crea
-    if "numero" not in session:
-        session["numero"] = random.randint(1, 100)
-    if "veces" not in session:
-        session["veces"] = 0
 
     mensaje = ""
-    
+
     if request.method == "POST":
+
         try:
-            intento = int(request.form["intento"])
-            numero = session["numero"]
-            veces_actual = int(session.get("veces", 0))
-            veces_actual += 1
-            session["veces"] = veces_actual
 
-            if intento < numero:
-                mensaje = "El número es MAYOR."
-            elif intento > numero:
-                mensaje = "El número es MENOR."
-            else:
-                nombre = request.args.get("nombre", "")
-                mensaje = "¡Adivinaste! "+nombre+" lo lograste en " + str(session["veces"]) + " oportunidades. Se generó un nuevo número."
-                
-                session["numero"] = random.randint(1, 100)
-                session["veces"] = 0
-        
-        except ValueError:
-            mensaje = "Ingresa un número válido."
+            documento = request.form["documento"]
+            nombre = request.form["nombre"]
+            correo = request.form["correo"]
+            programa = request.form["programa"]
+            puntaje = float(request.form["puntaje"])
 
-    return render_template("index.html", mensaje=mensaje)
+            # Validaciones
+            if not documento or not nombre:
+                raise Exception("Documento y nombre son obligatorios")
+
+            if "@" not in correo:
+                raise Exception("Correo inválido")
+
+            if puntaje < 0 or puntaje > 100:
+                raise Exception("Puntaje fuera de rango")
+
+            aplica_beca = "SI" if puntaje >= 85 else "NO"
+
+            # PostgreSQL
+            conexion = conectar_postgres()
+            cursor = conexion.cursor()
+
+            cursor.execute("""
+                INSERT INTO estudiantes
+                (documento,nombre,correo,programa,puntaje,aplica_beca)
+                VALUES (%s,%s,%s,%s,%s,%s)
+            """,
+            (
+                documento,
+                nombre,
+                correo,
+                programa,
+                puntaje,
+                aplica_beca
+            ))
+
+            conexion.commit()
+
+            cursor.close()
+            conexion.close()
+
+            # MongoDB
+            coleccion_estudiantes.insert_one({
+                "documento": documento,
+                "nombre": nombre,
+                "correo": correo,
+                "programa": programa,
+                "puntaje": puntaje,
+                "aplica_beca": aplica_beca
+            })
+
+            mensaje = f"Estudiante registrado. Beca: {aplica_beca}"
+
+        except Exception as e:
+
+            mensaje = f"Error: {str(e)}"
+
+    return render_template(
+        "index.html",
+        mensaje=mensaje
+    )
+
+if __name__ == "__main__":
+    app.run(debug=True)
