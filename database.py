@@ -1,20 +1,24 @@
-import os
 import psycopg2
-
 from pymongo import MongoClient
-from dotenv import load_dotenv
 
-load_dotenv()
+
+DATABASE_URL = "postgresql://becas_user:JFVShlF84qF3k47N2ZBlliUXrOWsXPN1@dpg-d8hnbl3tqb8s73a9t6tg-a.oregon-postgres.render.com/becas"
+
 
 def conectar_postgres():
-    return psycopg2.connect(
-        os.getenv("DATABASE_URL")
+
+    conexion = psycopg2.connect(
+        DATABASE_URL,
+        sslmode="require"
     )
 
-cliente = MongoClient(
-    os.getenv("MONGO_URI")
-)
+    return conexion
 
-db = cliente["becas"]
 
-coleccion_estudiantes = db["estudiantes"]
+#def conectar_mongo():
+
+  #  cliente = MongoClient(
+   #     "TU_URI_MONGO"
+    #)
+
+   # return cliente
