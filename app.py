@@ -7,38 +7,88 @@ app = Flask(__name__)
 def index():
 
     mensaje = ""
-
+    
+    
     if request.method == "POST":
 
         try:
-
+            #request.form obtiene datos
             documento = request.form["documento"]
             nombre = request.form["nombre"]
             correo = request.form["correo"]
             programa = request.form["programa"]
             puntaje = float(request.form["puntaje"])
-
+            
+            #Calcula beca
             aplica_beca = "SI" if puntaje >= 85 else "NO"
 
+            #Conecta PostgreSQL  
             conexion = conectar_postgres()
             cursor = conexion.cursor()
 
-            cursor.execute("SELECT NOW();")
-            resultado = cursor.fetchone()
 
+            #registro estudiantes INSERT
+            cursor.execute("""
+                INSERT INTO estudiantes
+                (documento, nombre, correo, programa, puntaje, aplica_beca)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """,
+            (
+                documento,
+                nombre,
+                correo,
+                programa,
+                puntaje,
+                aplica_beca
+            ))
+            
+
+            #COMMIT
+            conexion.commit()
+
+            #Cierra conexión
+            mensaje = "Estudiante registrado correctamente"
             cursor.close()
             conexion.close()
-
-            mensaje = (
-                f"Conexión exitosa con PostgreSQL. "
-                f"Aplica a beca: {aplica_beca}. "
-                f"Servidor respondió: {resultado[0]}"
-            )
+            
+            
 
         except Exception as e:
             mensaje = f"Error: {str(e)}"
 
-    return render_template("index.html", mensaje=mensaje)
+    #Abre nueva conexión
+    conexion = conectar_postgres()
+    cursor = conexion.cursor()
+
+    #SELECT estudiantes
+    cursor.execute("""
+        SELECT
+            documento,
+            nombre,
+            correo,
+            programa,
+            puntaje,
+            aplica_beca
+        FROM estudiantes
+        ORDER BY id DESC
+    """)
+    #obtener todos los registros.
+    estudiantes = cursor.fetchall()
+
+    # Cerrar conexión
+    cursor.close()
+    conexion.close()
+
+    return render_template(
+        "index.html",
+        mensaje=mensaje,
+        estudiantes=estudiantes
+    )
+        
+    
+        
+
+    
 
 if __name__ == "__main__":
     app.run(debug=True)
