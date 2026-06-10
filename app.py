@@ -64,6 +64,8 @@ def index():
                     "aplica_beca": aplica_beca
                 })
 
+                cliente.close()
+
                 mensaje = f"Mongo OK: {resultado.inserted_id}"
 
             except Exception as mongo_error:
@@ -102,6 +104,20 @@ def index():
     #obtener todos los registros.
     estudiantes = cursor.fetchall()
 
+    cliente = conectar_mongo()
+
+    db = cliente["adso"]
+
+    coleccion = db["estudiantes"]
+
+    estudiantes_mongo = list(
+        coleccion.find(
+            {},
+            {"_id": 0}
+        )
+    )
+    cliente.close()
+
     # Cerrar conexión
     cursor.close()
     conexion.close()
@@ -109,7 +125,8 @@ def index():
     return render_template(
         "index.html",
         mensaje=mensaje,
-        estudiantes=estudiantes
+        estudiantes=estudiantes,
+        estudiantes_mongo=estudiantes_mongo
     )
         
     
