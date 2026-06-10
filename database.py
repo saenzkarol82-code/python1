@@ -1,5 +1,7 @@
 import psycopg2
-#from pymongo import MongoClient
+import os
+from pymongo import MongoClient
+
 
 
 DATABASE_URL = "postgresql://becas_user:JFVShlF84qF3k47N2ZBlliUXrOWsXPN1@dpg-d8hnbl3tqb8s73a9t6tg-a.oregon-postgres.render.com/becas"
@@ -15,10 +17,10 @@ def conectar_postgres():
     return conexion
 
 
-#def conectar_mongo():
+MONGO_URI = "mongodb+srv://Estudiantes:REQ35wocsM8bisYx@cluster0.qyuyvw5.mongodb.net/?appName=Cluster0"
 
-  #  cliente = MongoClient(
-   #     "TU_URI_MONGO"
-    #)
+def conectar_mongo():
 
-   # return cliente
+    cliente = MongoClient(MONGO_URI)
+
+    return cliente

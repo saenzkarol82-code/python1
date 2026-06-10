@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 from database import conectar_postgres
+from database import conectar_mongo
 
 app = Flask(__name__)
 
@@ -87,8 +88,21 @@ def index():
         
     
         
-
-    
-
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+@app.route("/test-mongo")
+def test_mongo():
+
+    try:
+
+        cliente = conectar_mongo()
+
+        cliente.admin.command("ping")
+
+        return "Conexion exitosa con MongoDB Atlas"
+
+    except Exception as e:
+
+        return f"Error MongoDB: {e}"
