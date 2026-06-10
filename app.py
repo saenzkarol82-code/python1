@@ -16,7 +16,6 @@ def index():
             nombre = request.form["nombre"]
             correo = request.form["correo"]
             programa = request.form["programa"]
-            ficha = request.form["ficha"]
             puntaje = float(request.form["puntaje"])
 
             aplica_beca = "SI" if puntaje >= 85 else "NO"
