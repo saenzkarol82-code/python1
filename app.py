@@ -13,6 +13,9 @@ def index():
     if request.method == "POST":
 
         try:
+            print(request.form)
+
+
             #request.form obtiene datos
             documento = request.form["documento"]
             nombre = request.form["nombre"]
@@ -129,23 +132,50 @@ def index():
         estudiantes_mongo=estudiantes_mongo
     )
         
+       
     
+@app.route("/consulta")
+def consulta():
 
+    # PostgreSQL
+    conexion = conectar_postgres()
+    cursor = conexion.cursor()
 
-@app.route("/test-mongo")
-def test_mongo():
+    cursor.execute("""
+        SELECT
+            documento,
+            nombre,
+            correo,
+            programa,
+            puntaje,
+            aplica_beca
+        FROM estudiantes
+        ORDER BY id DESC
+    """)
 
-    try:
+    estudiantes = cursor.fetchall()
 
-        cliente = conectar_mongo()
+    cursor.close()
+    conexion.close()
 
-        cliente.admin.command("ping")
+    # MongoDB
+    cliente = conectar_mongo()
 
-        return "Conexion exitosa con MongoDB Atlas"
+    db = cliente["adso"]
 
-    except Exception as e:
+    coleccion = db["estudiantes"]
 
-        return f"Error MongoDB: {e}"    
+    estudiantes_mongo = list(
+        coleccion.find({}, {"_id": 0})
+    )
+
+    cliente.close()
+
+    return render_template(
+        "consulta.html",
+        estudiantes=estudiantes,
+        estudiantes_mongo=estudiantes_mongo
+    )
         
 if __name__ == "__main__":
     app.run(debug=True)
