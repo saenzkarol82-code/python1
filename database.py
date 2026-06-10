@@ -1,5 +1,5 @@
 import psycopg2
-from pymongo import MongoClient
+#from pymongo import MongoClient
 
 
 DATABASE_URL = "postgresql://becas_user:JFVShlF84qF3k47N2ZBlliUXrOWsXPN1@dpg-d8hnbl3tqb8s73a9t6tg-a.oregon-postgres.render.com/becas"
