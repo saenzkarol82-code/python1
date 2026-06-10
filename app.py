@@ -47,6 +47,34 @@ def index():
             #COMMIT
             conexion.commit()
 
+            try:
+
+                cliente = conectar_mongo()
+
+                db = cliente["becas"]
+
+                coleccion = db["estudiantes"]
+
+                coleccion.insert_one({
+                    "documento": documento,
+                    "nombre": nombre,
+                    "correo": correo,
+                    "programa": programa,
+                    "puntaje": puntaje,
+                    "aplica_beca": aplica_beca
+                })
+
+                cliente.close()
+
+                mensaje = "Estudiante registrado en PostgreSQL y MongoDB"
+
+            except Exception as mongo_error:
+
+                mensaje = (
+                    f"Registrado en PostgreSQL pero falló MongoDB: "
+                    f"{mongo_error}"
+                )
+
             #Cierra conexión
             mensaje = "Estudiante registrado correctamente"
             cursor.close()
