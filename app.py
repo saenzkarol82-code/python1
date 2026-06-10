@@ -51,11 +51,11 @@ def index():
 
                 cliente = conectar_mongo()
 
-                db = cliente["becas"]
+                db = cliente["adso"]
 
                 coleccion = db["estudiantes"]
 
-                coleccion.insert_one({
+                resultado = coleccion.insert_one({
                     "documento": documento,
                     "nombre": nombre,
                     "correo": correo,
@@ -64,9 +64,7 @@ def index():
                     "aplica_beca": aplica_beca
                 })
 
-                cliente.close()
-
-                mensaje = "Estudiante registrado en PostgreSQL y MongoDB"
+                mensaje = f"Mongo OK: {resultado.inserted_id}"
 
             except Exception as mongo_error:
 
