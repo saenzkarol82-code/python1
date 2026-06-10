@@ -87,9 +87,6 @@ def index():
     )
         
     
-        
-if __name__ == "__main__":
-    app.run(debug=True)
 
 
 @app.route("/test-mongo")
@@ -105,4 +102,9 @@ def test_mongo():
 
     except Exception as e:
 
-        return f"Error MongoDB: {e}"
+        return f"Error MongoDB: {e}"    
+        
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
