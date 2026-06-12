@@ -6,8 +6,10 @@ from database import conectar_mongo
 
 app = Flask(__name__)
 
-@app.route("/registro", methods=["GET", "POST"])
-def registro():
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 
 
 @app.route("/registro", methods=["GET", "POST"])
