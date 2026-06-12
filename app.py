@@ -2,10 +2,16 @@ from flask import Flask, render_template, request
 from database import conectar_postgres
 from database import conectar_mongo
 
+
+
 app = Flask(__name__)
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+@app.route("/registro", methods=["GET", "POST"])
+def registro():
+
+
+@app.route("/registro", methods=["GET", "POST"])
+def registro():
 
     mensaje = ""
     
@@ -126,7 +132,7 @@ def index():
     conexion.close()
 
     return render_template(
-        "index.html",
+        "registro.html",
         mensaje=mensaje,
         estudiantes=estudiantes,
         estudiantes_mongo=estudiantes_mongo
